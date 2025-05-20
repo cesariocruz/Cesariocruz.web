@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Boxing Train</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Anton&family=Roboto:wght@400;700&display=swap');
+
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    font-family: 'Roboto', sans-serif;
+    background: linear-gradient(135deg, #1a1a1a, #3d0000);
+    color: #f0f0f0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  header {
+    background: #b22222;
+    padding: 1rem 2rem;
+    text-align: center;
+    font-family: 'Anton', sans-serif;
+    font-weight: 700;
+    font-size: 2.5rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    box-shadow: 0 4px 8px rgba(178, 34, 34, 0.6);
+  }
+
+  main {
+    flex: 1;
+    padding: 2rem;
+    max-width: 900px;
+    margin: auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2.5rem;
+  }
+
+  .timer-section, .combo-section, .motivation-section {
+    background: #2c0b0b;
+    border-radius: 16px;
+    padding: 1.8rem 2rem;
+    box-shadow: 0 4px 20px rgba(178, 34, 34, 0.5);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .timer-section {
+    grid-column: 1 / 2;
+    align-items: center;
+  }
+
+  .timer-display {
+    font-family: 'Anton', sans-serif;
+    font-size: 6rem;
+    letter-spacing: 8px;
+    text-align: center;
+    margin-bottom: 1rem;
+    user-select: none;
+    color: #ff3c3c;
+    text-shadow: 0 0 8px #ff3c3c99;
+  }
+
+  .timer-controls {
+    display: flex;
+    justify-content: center;
+    gap: 1.2rem;
+  }
+
+  .btn {
+    background: #ff3c3c;
+    border: none;
+    padding: 0.8rem 1.6rem;
+    border-radius: 12px;
+    color: white;
+    font-weight: 700;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    box-shadow: 0 3px 8px #ff3c3ccc;
+  }
+
+  .btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .btn:hover:not(:disabled) {
+    background: #cc3232;
+  }
+
+  .combo-section {
+    grid-column: 2 / 3;
+    color: #ffdede;
+  }
+
+  .combo-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.8rem;
+    letter-spacing: 1px;
+    border-bottom: 2px solid #ff3c3c;
+    padding-bottom: 0.3rem;
+  }
+
+  .combo-list {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    user-select: none;
+    min-height: 6rem;
+  }
+
+  .combo-controls {
+    margin-top: 1rem;
+    text-align: center;
+  }
+
+  .motivation-section {
+    grid-column: 1 / 3;
+    margin-top: 2rem;
+    background: #3d0b0b;
+    color: #ffdede;
+    border-radius: 16px;
+    padding: 1.5rem 2rem;
+    box-shadow: 0 4px 20px rgba(178, 34, 34, 0.7);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .motivation-quote {
+    font-size: 1.4rem;
+    font-weight: 600;
+    font-style: italic;
+    text-align: center;
+    max-width: 700px;
+    margin-bottom: 1.2rem;
+    user-select: none;
+    line-height: 1.5;
+    text-shadow: 0 0 4px #ff3c3c8a;
+  }
+
+  @media (max-width: 700px) {
+    main {
+      grid-template-columns: 1fr;
+    }
+    .combo-section, .timer-section {
+      grid-column: 1 / 2;
+    }
+    .motivation-section {
+      margin-top: 1.5rem;
+    }
+  }
+
+</style>
+</head>
+<body>
+<header>
+  Boxing Train
+</header>
+<main>
+  <section class="timer-section" aria-label="Workout timer">
+    <div class="timer-display" id="timer">03:00</div>
+    <div class="timer-controls">
+      <button class="btn" id="startBtn" aria-label="Start timer">Start</button>
+      <button class="btn" id="pauseBtn" aria-label="Pause timer" disabled>Pause</button>
+      <button class="btn" id="resetBtn" aria-label="Reset timer">Reset</button>
+    </div>
+    <small style="margin-top: 0.8rem; text-align: center; color: #ff9999; user-select:none;">Round duration: 3 minutes</small>
+  </section>
+
+  <section class="combo-section" aria-label="Punch combos">
+    <div class="combo-title" id="comboTitle">Combo 1</div>
+    <div class="combo-list" id="comboList">Jab, Cross, Left Hook</div>
+    <div class="combo-controls">
+      <button class="btn" id="prevCombo" aria-label="Previous combo">Prev</button>
+      <button class="btn" id="nextCombo" aria-label="Next combo">Next</button>
+    </div>
+  </section>
+
+  <section class="motivation-section" aria-label="Motivational quote">
+    <div class="motivation-quote" id="motivationQuote">
+      "The fight is won or lost far away from witnesses."
+    </div>
+    <button class="btn" id="newQuoteBtn" aria-label="Get new motivational quote">Inspire Me</button>
+  </section>
+</main>
+
+<script>
+  // Timer logic
+  const timerDisplay = document.getElementById('timer');
+  const startBtn = document.getElementById('startBtn');
+  const pauseBtn = document.getElementById('pauseBtn');
+  const resetBtn = document.getElementById('resetBtn');
+
+  let timerDuration = 180; // seconds (3 minutes)
+  let timer = timerDuration;
+  let interval = null;
+
+  function formatTime(seconds) {
+    const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+    const s = (seconds % 60).toString().padStart(2, '0');
+    return `${m}:${s}`;
+  }
+
+  function updateTimerDisplay() {
+    timerDisplay.textContent = formatTime(timer);
+  }
+
+  function startTimer() {
+    if (interval) return;
+    interval = setInterval(() => {
+      if (timer > 0) {
+        timer--;
+        updateTimerDisplay();
+      } else {
+        clearInterval(interval);
+        interval = null;
+        startBtn.disabled = false;
+        pauseBtn.disabled = true;
+        alert('Round complete! Take a breather.');
+      }
+    }, 1000);
+    startBtn.disabled = true;
+    pauseBtn.disabled = false;
+  }
+
+  function pauseTimer() {
+    if (interval) {
+      clearInterval(interval);
+      interval = null;
+      startBtn.disabled = false;
+      pauseBtn.disabled = true;
+    }
+  }
+
+  function resetTimer() {
+    pauseTimer();
+    timer = timerDuration;
+    updateTimerDisplay();
+  }
+
+  startBtn.addEventListener('click', startTimer);
+  pauseBtn.addEventListener('click', pauseTimer);
+  resetBtn.addEventListener('click', resetTimer);
+
+  updateTimerDisplay();
+
+  // Punch Combos logic
+  const combos = [
+    {title: "Combo 1", moves: "Jab, Cross, Left Hook"},
+    {title: "Combo 2", moves: "Cross, Left Uppercut, Right Hook"},
+    {title: "Combo 3", moves: "Jab, Jab, Cross"},
+    {title: "Combo 4", moves: "Left Hook, Cross, Left Hook"},
+    {title: "Combo 5", moves: "Right Uppercut, Left Hook, Cross"}
+  ];
+  let currentComboIndex = 0;
+
+  const comboTitle = document.getElementById('comboTitle');
+  const comboList = document.getElementById('comboList');
+  const prevComboBtn = document.getElementById('prevCombo');
+  const nextComboBtn = document.getElementById('nextCombo');
+
+  function updateCombo() {
+    comboTitle.textContent = combos[currentComboIndex].title;
+    comboList.textContent = combos[currentComboIndex].moves;
+  }
+
+  prevComboBtn.addEventListener('click', () => {
+    currentComboIndex = (currentComboIndex - 1 + combos.length) % combos.length;
+    updateCombo();
+  });
+
+  nextComboBtn.addEventListener('click', () => {
+    currentComboIndex = (currentComboIndex + 1) % combos.length;
+    updateCombo();
+  });
+
+  updateCombo();
+
+  // Motivational quotes
+  const quotes = [
+    "The fight is won or lost far away from witnesses.",
+    "Champions keep playing until they get it right.",
+    "Sweat is the cologne of accomplishment.",
+    "One round at a time – keep your guard up.",
+    "Discipline is the bridge between goals and accomplishment.",
+    "Boxing isn’t just a sport, it’s a lifestyle."
+  ];
+
+  const motivationQuote = document.getElementById('motivationQuote');
+  const newQuoteBtn = document.getElementById('newQuoteBtn');
+
+  newQuoteBtn.addEventListener('click', () => {
+    let randomIndex;
+    do {
+      randomIndex = Math.floor(Math.random() * quotes.length);
+    } while (quotes[randomIndex] === motivationQuote.textContent);
+    motivationQuote.textContent = quotes[randomIndex];
+  });
+</script>
+
+</body>
+</html>
+
